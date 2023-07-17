@@ -1,15 +1,10 @@
 const mongoose = require("mongoose");
 
-const personSchema = new mongoose.Schema({
+const studentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-  },
-  role: {
-    type: String,
-    required: true,
-    enum: ["Student", "Teacher", "Parent", "Volunteer"],
   },
   firstName: {
     type: String,
@@ -30,7 +25,6 @@ const personSchema = new mongoose.Schema({
   },
   grade: {
     type: String,
-    enum: ["K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
   },
   accountBalance: {
     type: Number,
@@ -57,6 +51,6 @@ const personSchema = new mongoose.Schema({
   ]
 });
 
-const Person = mongoose.model("Person", personSchema);
+const Student = mongoose.model("Student", studentSchema);
 
-module.exports = Person;
+module.exports = Student;

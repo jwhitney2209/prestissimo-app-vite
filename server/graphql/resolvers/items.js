@@ -1,12 +1,12 @@
 const Item = require("../../models/Item");
-const checkAuth = require("../../utils/check-auth");
+const { authMiddleware } = require("../../utils/check-auth");
 
 module.exports = {
   Query: {
     async getItems(_, arts, context) {
-      const user = checkAuth(context);
+      const user = context.user;
       try {
-        const items = await Item.find({ userId: user.id }).sort({
+        const items = await Item.find({ userId: user._id }).sort({
           createdAt: -1,
         });
         return items;
@@ -28,30 +28,24 @@ module.exports = {
     },
   },
   Mutation: {
-    async createItem(
-      _,
-      { itemInput: { name, description, modelNumber, serialCode, quantity } },
-      context
-    ) {
-      const user = checkAuth(context);
+    async addItem(_, { name, description, quantity }, context) {
+      const user = context.user;
       const newItem = new Item({
         name,
         description,
-        modelNumber,
-        serialCode,
         quantity,
-        userId: user.id,
+        userId: user._id,
         createdAt: new Date().toISOString(),
       });
       const item = await newItem.save();
       return item;
     },
     async deleteItem(_, { itemId }, context) {
-      const user = checkAuth(context);
+      const user = context.user;
       try {
         const item = await Item.findById(itemId);
         const itemUserId = item.userId.toHexString();
-        if (user.id === itemUserId) {
+        if (user._id === itemUserId) {
           await item.deleteOne();
           return `${item.name} deleted successfully.`;
         } else {
@@ -63,10 +57,7 @@ module.exports = {
     },
     async updateItem(
       _,
-      {
-        itemId,
-        itemInput: { name, description, modelNumber, serialCode, quantity },
-      },
+      { itemId, name, description, modelNumber, serialCode, quantity },
       context
     ) {
       const item = (

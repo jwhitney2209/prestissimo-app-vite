@@ -1,13 +1,13 @@
 const Uniform = require("../../models/Uniform");
-const { AuthenticationError } = require("apollo-server");
-const checkAuth = require("../../utils/check-auth");
+const { GraphQLError } = require("graphql");
+const { authMiddleware } = require("../../utils/check-auth");
 
 module.exports = {
   Query: {
     async getUniforms(_, args, context) {
-      const user = checkAuth(context);
+      const user = context.user;
       try {
-        const uniforms = await Uniform.find({ userId: user.id }).sort({
+        const uniforms = await Uniform.find({ userId: user._id }).sort({
           createdAt: -1,
         });
         return uniforms;
@@ -17,31 +17,31 @@ module.exports = {
     },
   },
   Mutation: {
-    async createUniform(
+    async addUniform(
       _,
-      { uniformInput: { name, size, condition } },
+      { name, size, condition },
       context
     ) {
-      const user = checkAuth(context);
+      const user = context.user;
       const newUniform = new Uniform({
         name,
         size,
         condition,
-        userId: user.id,
+        userId: user._id,
         createdAt: new Date().toISOString(),
       });
       const uniform = await newUniform.save();
       return uniform;
     },
     async deleteUniform(_, { uniformId }, context) {
-      const user = checkAuth(context);
+      const user = context.user;
       try {
         const uniform = await Uniform.findById(uniformId);
         if (user.id === uniform.userId) {
           await uniform.delete();
           return "Uniform deleted successfully";
         } else {
-          throw new AuthenticationError("Action not allowed");
+          throw new GraphQLError("Action not allowed");
         }
       } catch (err) {
         throw new Error(err);
