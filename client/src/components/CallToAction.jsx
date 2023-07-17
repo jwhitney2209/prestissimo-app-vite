@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import Typed from "react-typed";
 
 export default function CallToAction() {
   return (
@@ -11,11 +10,8 @@ export default function CallToAction() {
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-200">
             Manage your program like never before. With Prestissimo you can
-            spend more time making music and less time on {" "}
-            <Typed className="text-white font-bold" strings={[' uniforms.', ' inventory.', ' fundraising.']}
-                    typeSpeed={80}
-                    backSpeed={80}
-                    loop />
+            spend more time making music and less time on inventory, fundraising, and uniforms.
+
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Link
